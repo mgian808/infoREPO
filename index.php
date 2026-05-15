@@ -17,8 +17,6 @@
     <title>SkillSwap</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/e9e5938e26.js" crossorigin="anonymous"></script>
-
-    
 </head>
 <body>
     <div class="logo">
@@ -31,11 +29,11 @@
     <!--<hr><br>-->
     <div class="myDiv">
         <br>
-        <a href="include/signupForm.php" class="myTitle" ><i class="fa-solid fa-user"></i> Sign Up</a> <br><br>
-        <a href="include/loginForm.php" class="myTitle"><i class="fa-solid fa-user"></i> Login</a> <br><br>
-        <a href="userpages/profile.php" class="myTitle"><i class="fa-solid fa-user"></i> Profile</a> <br><br>
-        <a href="include/match.php" class="myTitle"><i class="fa-solid fa-user"></i> Match</a> <br><br>
-        <a href="userpages/lista_chat.php" class="myTitle"><i class="fa-solid fa-user"></i> Messaggi</a> <br><br>
+        <a href="include/signupForm.php" class="AmyTitle" ><i class="fa-solid fa-user-plus"></i> Sign Up</a> <br><br>
+        <a href="include/loginForm.php" class="AmyTitle"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a> <br><br>
+        <a href="userpages/profile.php" class="AmyTitle"><i class="fa-solid fa-user"></i> Profile</a> <br><br>
+        <a href="include/match.php" class="AmyTitle"><i class="fa-solid fa-comment-nodes"></i> Match</a> <br><br>
+        <a href="userpages/lista_chat.php" class="AmyTitle"><i class="fa-regular fa-comments"></i> Messaggi</a> <br><br>
     </div>
     <br><hr>
     <div class="stress-input-box">
@@ -100,5 +98,11 @@
 </div>
 
     <br><br>
+    <div class="myDiv">
+        <p ><i class="fa-solid fa-user-secret"></i> User non loggato</p> <br>
+        <p><i class="fa-solid fa-user"></i> User loggato</p> <br>
+        <p><i class="fa-solid fa-gears"></i> impostazioni</p> <br>
+
+    </div>
 </body>
 </html>

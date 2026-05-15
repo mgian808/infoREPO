@@ -15,10 +15,20 @@ a{
     color: inherit;
 }
 
-.myTitle{
-    margin-left: 30px;
+.AmyTitle{
+    margin-left: 15px;
     font-size: 20px;
 }
+
+.AmyTitle:hover{
+    color: #774caf;
+}
+
+.myTitle{
+    margin-left: 15px;
+    font-size: 15px;
+}
+
 
 .myDiv{
     border: 3px solid black;

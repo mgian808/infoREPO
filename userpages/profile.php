@@ -34,6 +34,7 @@ try{
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profilo</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="https://kit.fontawesome.com/e9e5938e26.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <?php require_once '../include/header_home.php'; ?>
@@ -135,9 +136,8 @@ try{
         </form>
     </div>
     <br><hr><br>
-    <a href="../include/logout.php" class="myTitle">Log Out</a>
-    <a href="../index.php" class="myTitle">Torna alla home</a> <br><br>
-    
+    <a href="../include/logout.php" class="AmyTitle"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
+
 
 </body>
 </html>
