@@ -1,63 +1,72 @@
 <?php
-session_start(); 
-if(!isset($_SESSION['idUtente'])){ 
-    header('Location: loginForm.php'); 
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['idUtente'])) {
+    header('Location: loginForm.php');
     exit();
 }
 
+require_once 'dbHandler.php';
+$conn = DBHandler::getPDO();
+
+$id               = $_SESSION['idUtente'];
+$old_password     = $_POST['old_password']     ?? '';
+$new_password     = $_POST['new_password']     ?? '';
+$confirm_password = $_POST['confirm_password'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aggiorna Password</title>
+    <title>SkillSwap — Aggiorna Password</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="https://kit.fontawesome.com/e9e5938e26.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    
+<?php require_once 'navbar.php'; ?>
+<div class="page-content-narrow">
 <?php
-require_once 'dbHandler.php';
-$id = $_SESSION['idUtente'];
-$conn = DBHandler::getPDO();
-
-
-
-
-$old_password = $_POST['old_password'];
-$new_password = $_POST['new_password'];
-$confirm_password = $_POST['confirm_password'];
 
 if ($new_password !== $confirm_password) {
-    die("Le nuove password non corrispondono.");
+    echo '<div class="alert alert-error">Le nuove password non corrispondono.</div>';
+    echo '<a class="btn" href="editPassword.php">Torna indietro</a>';
+    exit();
+}
+
+if (strlen($new_password) < 8) {
+    echo '<div class="alert alert-error">La nuova password deve essere di almeno 8 caratteri.</div>';
+    echo '<a class="btn" href="editPassword.php">Torna indietro</a>';
+    exit();
 }
 
 try {
-    $sql = "SELECT password FROM utenti WHERE idUtente = :idUtente";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':idUtente' => $id]);
+    $conn->beginTransaction();
+
+    $stmt = $conn->prepare("SELECT password FROM utenti WHERE idUtente = :id");
+    $stmt->execute([':id' => $id]);
     $user = $stmt->fetch();
 
     if (!$user || !password_verify($old_password, $user['password'])) {
-        echo "La password attuale è errata.";
-        echo "<br><br><a class='btn' href='editPassword.php'>Torna indietro</a>";
+        $conn->rollBack();
+        echo '<div class="alert alert-error">La password attuale è errata.</div>';
+        echo '<a class="btn" href="editPassword.php">Torna indietro</a>';
         exit();
     }
 
-    $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
-    $update_sql = "UPDATE utenti SET password = :password WHERE idUtente = :idUtente";
-    $update_stmt = $conn->prepare($update_sql);
-    
-    if ($update_stmt->execute([':password' => $hashed_new_password, ':idUtente' => $id])) {
-        echo "La password è stata aggiornata con successo.";
-        echo "<br><br><a class='btn' href='../userpages/profile.php'>Torna al profilo</a>";
-        exit();
-    }
-    exit();
+    $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+    $upd = $conn->prepare("UPDATE utenti SET password = :password WHERE idUtente = :id");
+    $upd->execute([':password' => $hashed, ':id' => $id]);
+
+    $conn->commit();
+    echo '<div class="alert alert-success">Password aggiornata con successo!</div>';
+    echo '<a class="btn" href="../userpages/profile.php">Torna al Profilo</a>';
+
 } catch (PDOException $e) {
-    die("Errore di connessione: " . $e->getMessage());
+    $conn->rollBack();
+    echo '<div class="alert alert-error">Errore interno. Riprova.</div>';
 }
-
 ?>
+</div>
 </body>
 </html>

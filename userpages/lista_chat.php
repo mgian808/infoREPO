@@ -1,75 +1,103 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
+
 if (!isset($_SESSION['idUtente'])) {
-    header('Location:../include/loginForm.php'); 
+    header('Location: ../include/loginForm.php');
     exit();
 }
 
 require_once '../include/dbHandler.php';
 $conn = DBHandler::getPDO();
+
 $myId = $_SESSION['idUtente'];
 
-$sql = "SELECT 
-            u.idUtente, 
-            u.username, 
-            m.testo as ultimo_messaggio, 
-            m.data_invio,
-            (SELECT COUNT(*) FROM messaggi 
-             WHERE idMittente = u.idUtente 
-             AND idDestinatario = :myId 
-             AND letto = 0) as contatore_non_letti
+// Recupera tutte le conversazioni con ultimo messaggio e non letti
+$sql = "SELECT
+            u.idUtente,
+            u.username,
+            (SELECT testo FROM messaggi m2
+             WHERE (m2.idMittente = :myId1 AND m2.idDestinatario = u.idUtente)
+                OR (m2.idMittente = u.idUtente AND m2.idDestinatario = :myId2)
+             ORDER BY m2.data_invio DESC LIMIT 1) AS ultimo_messaggio,
+            (SELECT data_invio FROM messaggi m3
+             WHERE (m3.idMittente = :myId3 AND m3.idDestinatario = u.idUtente)
+                OR (m3.idMittente = u.idUtente AND m3.idDestinatario = :myId4)
+             ORDER BY m3.data_invio DESC LIMIT 1) AS data_invio,
+            (SELECT COUNT(*) FROM messaggi m4
+             WHERE m4.idMittente = u.idUtente AND m4.idDestinatario = :myId5 AND m4.letto = 0) AS non_letti
         FROM utenti u
-        INNER JOIN messaggi m ON (u.idUtente = m.idMittente OR u.idUtente = m.idDestinatario)
-        WHERE (m.idMittente = :myId OR m.idDestinatario = :myId)
-          AND u.idUtente != :myId
-          AND m.idMessaggio IN (
-              SELECT MAX(idMessaggio) 
-              FROM messaggi 
-              WHERE idMittente = :myId OR idDestinatario = :myId 
-              GROUP BY IF(idMittente = :myId, idDestinatario, idMittente)
+        WHERE u.idUtente != :myId6
+          AND EXISTS (
+              SELECT 1 FROM messaggi m5
+              WHERE (m5.idMittente = :myId7 AND m5.idDestinatario = u.idUtente)
+                 OR (m5.idMittente = u.idUtente AND m5.idDestinatario = :myId8)
           )
-        ORDER BY m.data_invio DESC";
+        ORDER BY data_invio DESC";
 
 $stmt = $conn->prepare($sql);
-$stmt->execute([':myId' => $myId]);
-$conversazioni = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute([
+    ':myId1' => $myId, ':myId2' => $myId,
+    ':myId3' => $myId, ':myId4' => $myId,
+    ':myId5' => $myId, ':myId6' => $myId,
+    ':myId7' => $myId, ':myId8' => $myId,
+]);
+$conversazioni = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>I miei Messaggi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap — Messaggi</title>
     <link rel="stylesheet" href="../style.css">
-
+    <script src="https://kit.fontawesome.com/e9e5938e26.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<?php require_once '../include/header_home.php'; ?>
-<div class="lista-conversazioni">
-    <h2 style="padding: 15px; background: #774caf; color: white; margin: 0;">Messaggi</h2>
-    
-    <?php if (empty($conversazioni)): ?>
-        <div class="senza-messaggi">Non hai ancora nessuna conversazione attiva.</div>
-    <?php else: ?>
-        <?php foreach ($conversazioni as $chat): ?>
-            <a href="chat.php?con=<?php echo $chat['idUtente']; ?>" class="chat-item">
-                <div class="chat-info">
-                    <div class="chat-info-header">
-                        <h4><?php echo htmlspecialchars($chat['username']); ?></h4>
-                        <?php if ($chat['contatore_non_letti'] > 0): ?>
-                            <span class="badge"><?php echo $chat['contatore_non_letti']; ?></span>
-                        <?php endif; ?>
-                    </div>
-                    <p><?php echo htmlspecialchars($chat['ultimo_messaggio']); ?></p>
-                </div>
-                <div class="chat-meta">
-                    <?php echo date('H:i', strtotime($chat['data_invio'])); ?>
-                </div>
-            </a>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+<?php require_once '../include/navbar.php'; ?>
 
+<div class="page-content-narrow">
+    <h1 style="margin-bottom:20px;">Messaggi</h1>
+
+    <div class="lista-conversazioni">
+        <h2>Conversazioni</h2>
+        <?php if (empty($conversazioni)): ?>
+            <div class="senza-messaggi">
+                <p style="font-size:2rem;margin-bottom:10px;"><i class="fa-regular fa-comment"></i></p>
+                <p>Nessuna conversazione ancora.</p>
+                <p style="font-size:13px;color:#999;margin:8px 0 16px;">Trova un match e inizia a studiare insieme!</p>
+                <a href="../include/match.php" class="btn"><i class="fa-solid fa-comment-nodes"></i> Trova un Match</a>
+            </div>
+        <?php else: ?>
+            <?php foreach ($conversazioni as $conv): ?>
+                <a href="chat.php?con=<?php echo $conv['idUtente']; ?>" class="chat-item">
+                    <div class="chat-avatar">
+                        <?php echo strtoupper(substr($conv['username'], 0, 1)); ?>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-info-header">
+                            <h4>
+                                <?php echo htmlspecialchars($conv['username']); ?>
+                                <?php if ($conv['non_letti'] > 0): ?>
+                                    <span class="badge"><?php echo $conv['non_letti']; ?></span>
+                                <?php endif; ?>
+                            </h4>
+                        </div>
+                        <p><?php echo htmlspecialchars(substr($conv['ultimo_messaggio'] ?? '—', 0, 50)); ?></p>
+                    </div>
+                    <div class="chat-meta">
+                        <?php if ($conv['data_invio']):
+                            $d    = new DateTime($conv['data_invio']);
+                            $oggi = new DateTime();
+                            echo $d->format('Y-m-d') === $oggi->format('Y-m-d')
+                                ? $d->format('H:i')
+                                : $d->format('d/m');
+                        endif; ?>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
 
 </body>
 </html>

@@ -1,10 +1,7 @@
 {
     "name": "skillswap",
-    "userpages": [],
-    "adminpages": [],
-    "loggedInPages": [],
-    "DBPages": []
+    "userpages":     ["profile.php", "lista_chat.php", "chat.php", "domanda.php"],
+    "adminpages":    ["stats.php", "gestione.php"],
+    "loggedInPages": ["profile.php", "lista_chat.php", "chat.php", "domanda.php", "match.php"],
+    "DBPages":       ["match.php", "profile.php", "lista_chat.php", "chat.php", "stats.php", "domanda.php", "gestione.php"]
 }
-
-
-

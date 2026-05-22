@@ -1,31 +1,39 @@
 <?php
-// read pages.json into $json which is a string
-/*echo $_SERVER['PHP_SELF'];
-echo substr_count($_SERVER['PHP_SELF'], '/');
-if(substr_count($_SERVER['PHP_SELF'], '/') == 4){
-    echo 'dentro lo if!!!!';*/
-$json = file_get_contents('../include/pages.json');
+// menuChoice.php — framework classificazione pagine
+// Include con require_once in cima a ogni pagina in userpages/ e adminpages/
 
-// get the name of the current page
-$pageName = basename($_SERVER['PHP_SELF']);
-
-$obj = json_decode($json);
- 
-
-
-// in_array(el, arr) checks if el is in array arr
-if(in_array($pageName, $obj->loggedInPages)){
-    require 'header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-if(in_array($pageName, $obj->DBPages)){
-    require 'DBHandler.php';
+$includeDir = dirname(__FILE__);
+$json       = file_get_contents($includeDir . '/pages.json');
+$obj        = json_decode($json);
+$pageName   = basename($_SERVER['PHP_SELF']);
+
+// Calcola quanti livelli di profondità siamo dalla root
+$profondita = substr_count(str_replace('\\', '/', $_SERVER['PHP_SELF']), '/') - 2;
+$base       = str_repeat('../', max(0, $profondita));
+
+// Pagine che richiedono login
+if (in_array($pageName, $obj->loggedInPages)) {
+    if (!isset($_SESSION['idUtente'])) {
+        header('Location: ' . $base . 'include/loginForm.php');
+        exit();
+    }
 }
 
-if(in_array($pageName, $obj->userpages)){
-    include 'userMenu.php';
-    // include ad.php;
-}elseif(in_array($pageName, $obj->adminpages)){
-    include 'adminMenu.php';
+// Pagine riservate ad admin
+if (in_array($pageName, $obj->adminpages)) {
+    if (!isset($_SESSION['ruolo']) || $_SESSION['ruolo'] !== 'admin') {
+        header('Location: ' . $base . 'index.php');
+        exit();
+    }
 }
-//}
+
+// Connessione DB
+if (in_array($pageName, $obj->DBPages)) {
+    require_once $includeDir . '/dbHandler.php';
+    $conn = DBHandler::getPDO();
+}
+?>
