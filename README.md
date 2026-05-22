@@ -1,110 +1,404 @@
-# infoREPO
 
-
-```markdown
 # SkillSwap
 
-Sito web per lo scambio di aiuto nello studio tra studenti.
-L'idea: "io ti insegno quello che so fare bene, tu mi insegni quello che non capisco."
+## 📚 Panoramica del Progetto
 
-## Funzionalità
+**SkillSwap** è una piattaforma web collaborativa pensata per aiutare gli studenti a supportarsi a vicenda attraverso un sistema intelligente di scambio competenze.
 
-- **Matching** tra studenti basato sui voti inseriti (OFFRO / CERCO)
-- **Tre livelli di match**: Top Match, Perfect Match, Match normale
-- **Chat** integrata tra utenti
-- **Stress bar** giornaliera della community
-- **Domanda del giorno** con risultati in percentuale
-- **Sistema di punti** e livelli (Studente, Compagno, Tutor, Mentor)
-- **Pannello admin** con statistiche sulla piattaforma
+La piattaforma permette agli utenti di:
 
-## Tecnologie
+* offrire aiuto nelle materie in cui sono più preparati
+* cercare supporto nelle materie in cui hanno difficoltà
+* ricevere match automatici tra studenti compatibili
+* comunicare tramite una chat integrata
+* monitorare il livello di stress della community
+* partecipare a domande giornaliere
+* ottenere punti esperienza e salire di livello
 
-- PHP 8
-- MySQL / MariaDB
-- HTML, CSS, JavaScript vanilla
-- Font Awesome (icone)
+L’obiettivo del progetto è trasformare lo studio in un’esperienza più collaborativa, sociale e coinvolgente.
 
-## Struttura del progetto
+---
 
+# ✨ Funzionalità Principali
+
+## 🔄 Sistema di Matching Intelligente
+
+SkillSwap analizza le materie e i voti inseriti dagli utenti per generare automaticamente abbinamenti compatibili.
+
+### Tipologie di Match
+
+| Tipo              | Descrizione                                                       |
+| ----------------- | ----------------------------------------------------------------- |
+| **Top Match**     | Scambio reciproco in cui entrambi gli utenti hanno voti alti (8+) |
+| **Perfect Match** | Scambio reciproco senza vincoli sui voti                          |
+| **Match**         | Compatibilità a senso unico                                       |
+
+### Logica del Matching
+
+Il sistema valuta:
+
+* materie offerte (`OFFRO`)
+* materie cercate (`CERCO`)
+* voti degli utenti
+* scuola frequentata
+* classe frequentata
+
+Bonus aggiuntivi:
+
+| Condizione    | Bonus     |
+| ------------- | --------- |
+| Stessa scuola | +50 punti |
+| Stessa classe | +20 punti |
+
+---
+
+## 💬 Sistema di Chat
+
+Gli utenti possono comunicare direttamente tramite una chat integrata nella piattaforma.
+
+Funzionalità principali:
+
+* chat private
+* lista conversazioni
+* storico messaggi
+* aggiornamento messaggi tramite AJAX
+* invio asincrono dei messaggi
+
+File principali:
+
+```text
+/userpages/chat.php
+/userpages/send_message.php
+/userpages/get_message.php
+/userpages/lista_chat.php
+/js/chat.js
 ```
-www/
-├── index.php               Homepage
-├── style.css               Foglio di stile
-├── include/                File PHP condivisi e di azione
-│   ├── config.php          Credenziali database
-│   ├── dbHandler.php       Connessione PDO (Singleton)
-│   ├── menuChoice.php      Framework: gestione accessi via pages.json
-│   ├── navbar.php          Navbar condivisa
-│   ├── pages.json          Classificazione pagine per il framework
-│   ├── login.php           Autenticazione
-│   ├── logout.php          Disconnessione
-│   ├── signup.php          Registrazione
-│   ├── addGrade.php        Inserimento voto
-│   ├── addSubject.php      Inserimento materia
-│   ├── deleteGrade.php     Eliminazione voto
-│   ├── updateGrade.php     Modifica voto
-│   ├── updatePassword.php  Modifica password
-│   ├── salva_stress.php    Voto stress giornaliero
-│   └── match.php           Pagina matching
-├── userpages/              Pagine per utenti loggati
-│   ├── profile.php         Profilo utente
-│   ├── lista_chat.php      Lista conversazioni
-│   ├── chat.php            Chat singola
-│   ├── get_message.php     API caricamento messaggi
-│   ├── send_message.php    API invio messaggi
-│   ├── domanda.php         Domanda del giorno
-│   └── salva_risposta.php  Salvataggio risposta
-├── adminpages/             Pagine riservate agli admin
-│   └── stats.php           Statistiche piattaforma
-├── pages/                  Pagine informative pubbliche
-│   ├── come-funziona.php   Spiegazione del sito
-│   └── contattaci.php      Contatti
-└── js/
-    ├── chat.js             Logica JavaScript della chat
-    └── scuole.js           Caricamento dinamico comuni e scuole
+
+---
+
+## 📈 Sistema di Gamification
+
+Gli utenti ottengono punti partecipando attivamente alla piattaforma.
+
+### Sistema Punti
+
+| Azione                       | Punti |
+| ---------------------------- | ----- |
+| Registrazione                | +10   |
+| Inserimento voto OFFRO/CERCO | +2    |
+| Nuova proposta SkillSwap     | +5    |
+
+### Livelli Utente
+
+| Punti    | Livello  |
+| -------- | -------- |
+| 0 – 20   | Studente |
+| 21 – 50  | Compagno |
+| 51 – 100 | Tutor    |
+| 100+     | Mentor   |
+
+---
+
+## 😵 Barra dello Stress
+
+La piattaforma include un sistema giornaliero di monitoraggio dello stress.
+
+Gli utenti possono:
+
+* votare il proprio livello di stress (1–10)
+* contribuire alla media globale della community
+* visualizzare il livello medio di stress nella homepage
+
+La barra cambia dinamicamente colore in base al livello medio registrato.
+
+---
+
+## ❓ Domanda del Giorno
+
+Ogni giorno gli utenti possono rispondere a una domanda della community per aumentare l’interazione tra studenti.
+
+---
+
+## 👤 Gestione Profilo Utente
+
+Ogni profilo contiene:
+
+* informazioni personali
+* scuola e classe
+* voti inseriti
+* materie offerte/richieste
+* livello utente
+* statistiche
+* storico match
+
+---
+
+# 🏗️ Struttura del Progetto
+
+```text
+SkillSwap/
+│
+├── adminpages/
+│   └── stats.php
+│
+├── images/
+│   └── logo_bozza.png
+│
+├── include/
+│   ├── addGrade.php
+│   ├── addSubject.php
+│   ├── config.php
+│   ├── dbHandler.php
+│   ├── login.php
+│   ├── logout.php
+│   ├── match.php
+│   └── ...
+│
+├── js/
+│   ├── chat.js
+│   ├── scuole.js
+│   └── scuole.json
+│
+├── pages/
+│   ├── come-funziona.php
+│   └── contattaci.php
+│
+├── userpages/
+│   ├── chat.php
+│   ├── domanda.php
+│   ├── profile.php
+│   ├── send_message.php
+│   └── ...
+│
+├── index.php
+├── style.css
+└── skillswap_db.sql
 ```
 
-## Setup
+---
 
-### 1. Database
+# 🛠️ Tecnologie Utilizzate
 
-Importa il file SQL in MySQL:
+## Backend
+
+* PHP
+* MySQL
+* PDO
+
+## Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+* AJAX
+
+## Database
+
+* Database relazionale MySQL
+* Stored procedure per la logica di matching
+
+---
+
+# 🗄️ Database
+
+Il progetto include un dump SQL completo:
+
+```text
+skillswap_db.sql
+```
+
+Il database gestisce:
+
+* utenti
+* voti
+* materie
+* match
+* messaggi
+* stress giornaliero
+* domande giornaliere
+* punti e livelli
+
+---
+
+# ⚙️ Installazione
+
+## 1. Clonare il Repository
 
 ```bash
-mysql -u root -p < skillswap.sql
+git clone https://github.com/tuo-username/skillswap.git
 ```
 
-Poi esegui la stored procedure aggiornata:
+---
 
-```bash
-mysql -u root -p skillswapprova < fix_sp.sql
+## 2. Configurare il Database
+
+Creare un database MySQL e importare:
+
+```text
+skillswap_db.sql
 ```
 
-### 2. Configurazione
+---
 
-Modifica `include/config.php` con le tue credenziali:
+## 3. Configurare la Connessione
+
+Modificare:
+
+```text
+/include/config.php
+```
+
+Esempio:
 
 ```php
-$host     = 'localhost';
-$db       = 'skillswapprova';
-$user     = 'root';
+$host = 'localhost';
+$db = 'skillswap';
+$user = 'root';
 $password = '';
 ```
 
-### 3. Server
+---
 
-Richiede Apache con PHP 8+ e mod_rewrite attivo.
-Per sviluppo locale puoi usare XAMPP, WAMP o Docker.
+## 4. Avviare il Server
 
-## Account di default
+Esempio con XAMPP:
 
-Dopo aver importato il DB, imposta il tuo account come admin:
+1. Avviare Apache
+2. Avviare MySQL
+3. Spostare il progetto dentro:
 
-```sql
-UPDATE utenti SET ruolo = 'admin' WHERE email = 'tua@email.com';
+```text
+htdocs/
 ```
 
-## Autore
+4. Aprire:
 
-Mattia Giancristofaro — Progetto finale di Informatica 2024/2025
+```text
+http://localhost/SkillSwap
 ```
+
+---
+
+# 🔐 Sistema di Autenticazione
+
+La piattaforma include:
+
+* registrazione utenti
+* login/logout
+* gestione sessioni
+* modifica password
+* protezione pagine riservate
+
+File principali:
+
+```text
+/include/login.php
+/include/signup.php
+/include/logout.php
+/include/editPassword.php
+```
+
+---
+
+# 🎨 Interfaccia Grafica
+
+L’interfaccia è progettata per essere:
+
+* moderna
+* responsive
+* intuitiva
+* accessibile
+* adatta agli studenti
+
+Foglio di stile principale:
+
+```text
+style.css
+```
+
+---
+
+# 📊 Funzionalità Admin
+
+La sezione amministratore include statistiche e monitoraggio della piattaforma.
+
+```text
+/adminpages/stats.php
+```
+
+Possibili statistiche:
+
+* utenti attivi
+* numero totale di match
+* andamento stress community
+* coinvolgimento utenti
+
+---
+
+# 🚀 Possibili Miglioramenti Futuri
+
+Funzionalità implementabili in futuro:
+
+* sistema notifiche
+* videochiamate
+* condivisione file
+* suggerimenti AI
+* applicazione mobile
+* dashboard avanzata
+* badge e achievement
+* verifica email
+* dark mode
+
+---
+
+# 🧠 Obiettivi Didattici
+
+Questo progetto dimostra competenze in:
+
+* sviluppo web full-stack
+* progettazione database
+* gestione sessioni
+* comunicazione AJAX
+* sistemi di matching
+* gamification
+* responsive design
+
+---
+
+# 📸 Screenshot
+
+Puoi inserire qui gli screenshot del progetto:
+
+```md
+![Homepage](images/screenshot-home.png)
+![Profilo](images/screenshot-profile.png)
+![Chat](images/screenshot-chat.png)
+```
+
+---
+
+# 👨‍💻 Autori
+
+Progetto sviluppato come piattaforma collaborativa educativa.
+
+---
+
+# 📄 Licenza
+
+Questo progetto è distribuito a scopo didattico.
+
+Puoi personalizzare la licenza in base alle tue esigenze.
+
+Esempio:
+
+```text
+MIT License
+```
+
+---
+
+# ❤️ Note Finali
+
+SkillSwap nasce dall’idea che gli studenti imparino meglio collaborando.
+
+Invece di competere, gli utenti possono aiutarsi a vicenda condividendo conoscenze e migliorando insieme.
