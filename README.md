@@ -1,7 +1,7 @@
 # infoREPO
 
 
-```
+```markdown
 # SkillSwap
 
 Sito web per lo scambio di aiuto nello studio tra studenti.
